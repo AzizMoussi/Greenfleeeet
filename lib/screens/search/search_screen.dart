@@ -677,4 +677,5 @@ class _FindRidePageState extends State<FindRidePage> {
     }
   }
 }
+
 /* lclass mta3 e données eli bech yousseli esmou ride_searched_data */

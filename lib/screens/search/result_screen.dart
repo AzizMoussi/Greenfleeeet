@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../models/Ride_Response_dart.dart';
+import '../../models/user_model.dart';
+import '/models/booked_ride_data.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'booked_screen.dart';
 
 
 class ResultScreen extends StatefulWidget {
@@ -14,8 +21,14 @@ class ResultScreen extends StatefulWidget {
 class _ResultScreenState extends State<ResultScreen> {
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return Scaffold(
       appBar: AppBar(
@@ -132,6 +145,10 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   Widget _buildRideCard(BuildContext context, RideResponse ride) {
+    final userModel = Provider.of<UserModel>(context);
+    final user = userModel.user;
+    final token = userModel.token;
+    final passengerId = user?['userId'];
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -250,7 +267,21 @@ class _ResultScreenState extends State<ResultScreen> {
                       child: ElevatedButton.icon(
                         icon: Icon(Icons.directions_car, size: 20),
                         label: Text('Book Now'),
-                        onPressed: () => _showBookingDialog(context, ride),
+                        onPressed: () {
+                          handleBook(
+                              context,
+                              passengerId,
+                              // Replace with the correct passengerId
+                              ride.rideId,
+                              ride.stopoverName,
+                              token!
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BookedScreen()),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF1b4242),
                           foregroundColor: Colors.white,
@@ -260,6 +291,8 @@ class _ResultScreenState extends State<ResultScreen> {
                           ),
                         ),
                       ),
+
+
                     ),
                   ],
                 ),
@@ -333,89 +366,91 @@ class _ResultScreenState extends State<ResultScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Message ${ride.driverName}'),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: 'Type your message...',
-            border: OutlineInputBorder(),
-          ),
-          maxLines: 3,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Message sent to ${ride.driverName}'),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF1b4242),
+      builder: (context) =>
+          AlertDialog(
+            title: Text('Message ${ride.driverName}'),
+            content: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: 'Type your message...',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
             ),
-            child: Text('Send'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Message sent to ${ride.driverName}'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF1b4242),
+                ),
+                child: Text('Send'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   void _showBookingDialog(BuildContext context, RideResponse ride) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Confirm Booking'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(Icons.person, color: Color(0xFF1b4242)),
-              title: Text('Driver'),
-              subtitle: Text(ride.driverName),
+      builder: (context) =>
+          AlertDialog(
+            title: Text('Confirm Booking'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.person, color: Color(0xFF1b4242)),
+                  title: Text('Driver'),
+                  subtitle: Text(ride.driverName),
+                ),
+                ListTile(
+                  leading: Icon(Icons.directions_car, color: Color(0xFF1b4242)),
+                  title: Text('Vehicle'),
+                  subtitle: Text(ride.carName),
+                ),
+                ListTile(
+                  leading: Icon(Icons.star, color: Color(0xFF1b4242)),
+                  title: Text('Rating'),
+                  subtitle: Text(ride.rateDriver.toStringAsFixed(1)),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Confirm ride request with ${ride.driverName}?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
-            ListTile(
-              leading: Icon(Icons.directions_car, color: Color(0xFF1b4242)),
-              title: Text('Vehicle'),
-              subtitle: Text(ride.carName),
-            ),
-            ListTile(
-              leading: Icon(Icons.star, color: Color(0xFF1b4242)),
-              title: Text('Rating'),
-              subtitle: Text(ride.rateDriver.toStringAsFixed(1)),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Confirm ride request with ${ride.driverName}?',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _showBookingConfirmation(context, ride);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF1b4242),
+                ),
+                child: Text('Confirm'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _showBookingConfirmation(context, ride);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF1b4242),
-            ),
-            child: Text('Confirm'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -423,35 +458,95 @@ class _ResultScreenState extends State<ResultScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.green),
-            SizedBox(width: 8),
-            Text('Booking Confirmed'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Your ride with ${ride.driverName} has been confirmed!'),
-            SizedBox(height: 16),
-            Text(
-              'Driver will contact you shortly',
-              style: TextStyle(fontStyle: FontStyle.italic),
+      builder: (context) =>
+          AlertDialog(
+            title: Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.green),
+                SizedBox(width: 8),
+                Text('Booking Confirmed'),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context); // Close both dialogs
-            },
-            child: Text('Done'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Your ride with ${ride.driverName} has been confirmed!'),
+                SizedBox(height: 16),
+                Text(
+                  'Driver will contact you shortly',
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context); // Close both dialogs
+                },
+                child: Text('Done'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
+  }
+
+  Future<void> handleBook(BuildContext context, int? passengerId, int rideId,
+      String pickupLocation, String? token) async {
+    if (passengerId == null || token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Missing passenger information or token.')),
+      );
+      return;
+    }
+
+    // Create the Booked object
+    Booked booked = Booked.initial(
+      passengerId: passengerId,
+      rideId: rideId,
+      pickupLocation: pickupLocation,
+    );
+
+    // Convert the Booked object to JSON
+    String jsonPayload = jsonEncode(booked.toJson());
+
+    print('JSON Payload Sent: $jsonPayload');
+
+    try {
+      // Send the booking request
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/bookings/create/$rideId/$passengerId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonPayload,
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        // Booking successful
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Booking successful!')),
+        );
+
+        // Navigate to BookedScreen
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => BookedScreen()),
+        );
+      } else {
+        // Handle server error
+        print('Server error: ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to book. Please try again.')),
+        );
+      }
+    } catch (e) {
+      // Handle network error
+      print('Network error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Network error. Please try again.')),
+      );
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../dto/BookingDTO.dart';
 import '../dto/RideDTO.dart';
 import '../dto/VehicleDTO.dart';
 
@@ -9,6 +10,7 @@ class UserModel with ChangeNotifier {
   String? _token;
   List<RideDTO> rides = [];
   List<VehicleDTO> vehicles = [];
+  List<Booked> bookings = [];
   bool isLoading = false;
 
   Map<String, dynamic>? get user => _user;
@@ -31,11 +33,13 @@ class UserModel with ChangeNotifier {
       // Wait for both fetches to complete
       await Future.wait([
         _fetchRides(),
-        _fetchVehicles()
+        _fetchVehicles(),
+        _fetchBookings(),
       ]);
       print('Finished fetching rides and vehicles');
       print('Final rides count: ${rides.length}');
       print('Final vehicles count: ${vehicles.length}');
+      print('Final bookings count: ${bookings.length}');
     } catch (e) {
       print('Error in setUserData: $e');
     } finally {
@@ -44,11 +48,18 @@ class UserModel with ChangeNotifier {
     }
   }
 
+  Future<void> refreshBookings() async {
+    await _fetchBookings();
+  }
+
+
   // Getter for rides
   List<RideDTO> get getRides => rides;
 
   // Getter for vehicles
   List<VehicleDTO> get getVehicles => vehicles;
+
+  List<Booked> get getBookings => bookings;
 
   Future<void> _fetchRides() async {
     print('Starting _fetchRides()');
@@ -178,5 +189,37 @@ class UserModel with ChangeNotifier {
       print('Exception in _getVehicleById: $e');
     }
     return null;
+  }
+
+
+  Future<void> _fetchBookings() async {
+    print('Starting _fetchBookings()');
+    if (_user == null || _user!['userId'] == null) return;
+
+    final userId = _user!['userId'];
+    final url = Uri.parse('http://localhost:8080/bookings/user/$userId');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $_token',
+    };
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> responseData = jsonDecode(response.body);
+        bookings = responseData.map((booking) => Booked.fromJson(booking)).toList();
+        print('Fetched ${bookings.length} bookings.');
+        bookings.forEach((booking) {
+          print(booking);
+        });
+
+      } else {
+        print('Failed to fetch bookings. Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Exception in _fetchBookings: $e');
+    }
+    notifyListeners();
   }
 }

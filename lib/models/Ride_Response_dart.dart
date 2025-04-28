@@ -1,4 +1,5 @@
 class RideResponse {
+  int rideId;
   int driverId;
   String driverName;
   String carName;
@@ -8,6 +9,7 @@ class RideResponse {
   List<String> prefrences; // not preferences
 
   RideResponse({
+    required this.rideId,
     required this.driverId,
     required this.driverName,
     required this.carName,
@@ -19,6 +21,7 @@ class RideResponse {
 
   factory RideResponse.fromJson(Map<String, dynamic> json) {
     return RideResponse(
+      rideId: json['rideId'],
       driverId: json['driverId'], // correct key
       driverName: json['driverName'],
       carName: json['carName'],
@@ -31,6 +34,7 @@ class RideResponse {
 
   Map<String, dynamic> toJson() {
     return {
+      'rideId':rideId,
       'driverId': driverId,
       'driverName': driverName,
       'carName': carName,
