@@ -1,57 +1,67 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import '../dto/BookingDTO.dart';
+import '../dto/FriendChatDto.dart';
 import '../dto/RideDTO.dart';
 import '../dto/VehicleDTO.dart';
-
+import 'booking_response_data.dart';
 class UserModel with ChangeNotifier {
   Map<String, dynamic>? _user;
   String? _token;
   List<RideDTO> rides = [];
   List<VehicleDTO> vehicles = [];
-  List<Booked> bookings = [];
+  List<BookingResponseDto> bookings = [];
+  List<FriendChatDTO> friends = [];
+
+
+
   bool isLoading = false;
+
+  Timer? _autoRefreshTimer;
 
   Map<String, dynamic>? get user => _user;
   String? get token => _token;
+  List<FriendChatDTO> get getFriends => friends;
 
   void updateUser(Map<String, dynamic> updatedUser) {
+    _autoRefreshTimer?.cancel();
     _user = updatedUser;
     notifyListeners();
   }
 
   Future<void> setUserData(Map<String, dynamic> user, String token) async {
-    print('Setting user data: $user');
+    //('Setting user data: $user');
     _user = user;
     _token = token;
     isLoading = true;
     notifyListeners();
 
-    print('Starting to fetch rides and vehicles...');
+    //('Starting to fetch rides and vehicles...');
     try {
       // Wait for both fetches to complete
       await Future.wait([
         _fetchRides(),
         _fetchVehicles(),
         _fetchBookings(),
+        _fetchFriends(),
       ]);
-      print('Finished fetching rides and vehicles');
-      print('Final rides count: ${rides.length}');
-      print('Final vehicles count: ${vehicles.length}');
-      print('Final bookings count: ${bookings.length}');
+      //('Finished fetching rides and vehicles');
+      //('Final rides count: ${rides.length}');
+      //('Final vehicles count: ${vehicles.length}');
+      //('Final bookings count: ${bookings.length}');
     } catch (e) {
-      print('Error in setUserData: $e');
+      //('Error in setUserData: $e');
     } finally {
       isLoading = false;
       notifyListeners();
     }
+    _startAutoRefresh();
   }
 
   Future<void> refreshBookings() async {
     await _fetchBookings();
   }
-
 
   // Getter for rides
   List<RideDTO> get getRides => rides;
@@ -59,39 +69,39 @@ class UserModel with ChangeNotifier {
   // Getter for vehicles
   List<VehicleDTO> get getVehicles => vehicles;
 
-  List<Booked> get getBookings => bookings;
+  List<BookingResponseDto> get getBookings => bookings;
 
   Future<void> _fetchRides() async {
-    print('Starting _fetchRides()');
+    //('Starting _fetchRides()');
     if (_user == null) {
-      print('_user is null, returning');
+      //('_user is null, returning');
       return;
     }
 
     if (_user!['publishedRides'] == null) {
-      print('publishedRides is null, returning');
+      //('publishedRides is null, returning');
       return;
     }
 
-    print('publishedRides: ${_user!['publishedRides']}');
+    //('publishedRides: ${_user!['publishedRides']}');
     List<RideDTO> fetchedRides = [];
 
     for (var rideId in _user!['publishedRides']) {
-      print('Fetching ride with ID: $rideId');
+      //('Fetching ride with ID: $rideId');
       try {
         var rideResponse = await _getRideById(rideId);
         if (rideResponse != null) {
-          print('Successfully fetched ride: ${rideResponse.rideId}');
+          //('Successfully fetched ride: ${rideResponse.rideId}');
           fetchedRides.add(rideResponse);
         } else {
-          print('Failed to fetch ride with ID: $rideId');
+          //('Failed to fetch ride with ID: $rideId');
         }
       } catch (e) {
-        print('Error fetching ride $rideId: $e');
+        //('Error fetching ride $rideId: $e');
       }
     }
 
-    print('Total rides fetched: ${fetchedRides.length}');
+    //('Total rides fetched: ${fetchedRides.length}');
     rides = fetchedRides;
     notifyListeners();
   }
@@ -99,7 +109,7 @@ class UserModel with ChangeNotifier {
   Future<RideDTO?> _getRideById(int rideId) async {
     try {
       final url = Uri.parse('http://localhost:8080/rides/$rideId');
-      print('Sending GET request to: $url');
+      ////('Sending GET request to: $url');
 
       // Add authorization header with bearer token
       final headers = {
@@ -107,56 +117,66 @@ class UserModel with ChangeNotifier {
         'Authorization': 'Bearer $_token',
       };
 
-      print('Request headers: $headers');
+      ////('Request headers: $headers');
       final response = await http.get(url, headers: headers);
 
-      print('Response status code: ${response.statusCode}');
+      //('Response status code: ${response.statusCode}');
       if (response.statusCode == 200) {
-        print('Response body: ${JsonEncoder.withIndent('  ').convert(jsonDecode(response.body))}');
+        //('Response body: ${JsonEncoder.withIndent('  ').convert(jsonDecode(response.body))}');
         final decodedBody = utf8.decode(response.bodyBytes);
-        final rideData = jsonDecode(decodedBody);
+        final ride = jsonDecode(decodedBody);
 
-        return RideDTO.fromJson(rideData);
+
+        //('YOYOYOYOYOY:\n${JsonEncoder.withIndent('  ').convert(ride)}');
+
+        // Tu peux aussi inspecter manuellement certains champs :
+        //('Preferences field: ${ride["preferences"]}');
+        //('Stopovers field: ${ride["stopovers"]}');
+        //('Booking field: ${ride["booking"]}');
+
+
+
+        return RideDTO.fromJson(ride);
       } else {
-        print('Error response: ${response.body}');
+        //('Error response: ${response.body}');
       }
     } catch (e) {
-      print('Exception in _getRideById: $e');
+      //('Exception in _getRideById: $e');
     }
     return null;
   }
 
   Future<void> _fetchVehicles() async {
-    print('Starting _fetchVehicles()');
+    //('Starting _fetchVehicles()');
     if (_user == null) {
-      print('_user is null, returning');
+      //('_user is null, returning');
       return;
     }
 
     if (_user!['vehicles'] == null) {
-      print('vehicles is null, returning');
+      //('vehicles is null, returning');
       return;
     }
 
-    print('vehicles: ${_user!['vehicles']}');
+    //('vehicles: ${_user!['vehicles']}');
     List<VehicleDTO> fetchedVehicles = [];
 
     for (var vehicleId in _user!['vehicles']) {
-      print('Fetching vehicle with ID: $vehicleId');
+      //('Fetching vehicle with ID: $vehicleId');
       try {
         var vehicleResponse = await _getVehicleById(vehicleId);
         if (vehicleResponse != null) {
-          print('Successfully fetched vehicle: ${vehicleResponse.vehicleId}');
+          //('Successfully fetched vehicle: ${vehicleResponse.vehicleId}');
           fetchedVehicles.add(vehicleResponse);
         } else {
-          print('Failed to fetch vehicle with ID: $vehicleId');
+          //('Failed to fetch vehicle with ID: $vehicleId');
         }
       } catch (e) {
-        print('Error fetching vehicle $vehicleId: $e');
+        //('Error fetching vehicle $vehicleId: $e');
       }
     }
 
-    print('Total vehicles fetched: ${fetchedVehicles.length}');
+    //('Total vehicles fetched: ${fetchedVehicles.length}');
     vehicles = fetchedVehicles;
     notifyListeners();
   }
@@ -164,7 +184,7 @@ class UserModel with ChangeNotifier {
   Future<VehicleDTO?> _getVehicleById(int vehicleId) async {
     try {
       final url = Uri.parse('http://localhost:8080/vehicles/$vehicleId');
-      print('Sending GET request to: $url');
+      //('Sending GET request to: $url');
 
       // Add authorization header with bearer token
       final headers = {
@@ -172,28 +192,27 @@ class UserModel with ChangeNotifier {
         'Authorization': 'Bearer $_token',
       };
 
-      print('Request headers: $headers');
+      //('Request headers: $headers');
       final response = await http.get(url, headers: headers);
 
-      print('Response status code: ${response.statusCode}');
+      //('Response status code: ${response.statusCode}');
       if (response.statusCode == 200) {
-        print('Response body: ${JsonEncoder.withIndent('  ').convert(jsonDecode(response.body))}');
+        //('Response body: ${JsonEncoder.withIndent('  ').convert(jsonDecode(response.body))}');
         final decodedBody = utf8.decode(response.bodyBytes);
         final vehicleData = jsonDecode(decodedBody);
 
         return VehicleDTO.fromJson(vehicleData);
       } else {
-        print('Error response: ${response.body}');
+        //('Error response: ${response.body}');
       }
     } catch (e) {
-      print('Exception in _getVehicleById: $e');
+      //('Exception in _getVehicleById: $e');
     }
     return null;
   }
 
-
   Future<void> _fetchBookings() async {
-    print('Starting _fetchBookings()');
+    //('Starting _fetchBookings()');
     if (_user == null || _user!['userId'] == null) return;
 
     final userId = _user!['userId'];
@@ -208,18 +227,88 @@ class UserModel with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
-        bookings = responseData.map((booking) => Booked.fromJson(booking)).toList();
-        print('Fetched ${bookings.length} bookings.');
+        bookings = responseData.map((booking) => BookingResponseDto.fromJson(booking)).toList();
+        //('Fetched ${bookings.length} bookings.');
         bookings.forEach((booking) {
-          print(booking);
+          //(booking);
         });
 
       } else {
-        print('Failed to fetch bookings. Status: ${response.statusCode}');
+        //('Failed to fetch bookings. Status: ${response.statusCode}');
       }
     } catch (e) {
-      print('Exception in _fetchBookings: $e');
+      //('Exception in _fetchBookings: $e');
     }
     notifyListeners();
   }
+
+  void _startAutoRefresh() {
+    _autoRefreshTimer?.cancel();
+
+    _autoRefreshTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
+      //('Auto-refreshing...');
+      try {
+        await Future.wait([
+          _fetchRides(),
+          _fetchVehicles(),
+          _fetchBookings(),
+          _fetchFriends()
+        ]);
+      } catch (e) {
+        //('Error during auto-refresh: $e');
+      }
+    });
+  }
+
+  Future<void> _fetchFriends() async {
+    if (_user == null || _user!['userId'] == null) return;
+
+    final userId = _user!['userId'];
+    final url = Uri.parse('http://localhost:8080/messages/friends/$userId');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $_token',
+    };
+
+    try {
+      final response = await http.get(url, headers: headers);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        friends = data.map((e) => FriendChatDTO.fromJson(e)).toList();
+      } else {
+        print('Failed to fetch friends: ${response.statusCode}');
+      }
+    } catch (e) {
+        print('Exception while fetching friends: $e');
+    }
+
+    notifyListeners();
+  }
+
+
 }
+
+// rideId -> list of booking ->
+
+
+
+/*
+
+   -Enit         Start
+
+   -Beb saadoun   arrived     (passengerId , rideId)
+
+   -Ensi(entreprise)   arrived
+
+ */
+
+
+
+
+
+
+
+
+
+
+

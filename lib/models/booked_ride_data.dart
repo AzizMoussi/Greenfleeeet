@@ -1,7 +1,18 @@
 
 
 enum BookingStatus { PENDING, ONGOING, REJECTED, REACHED }
+/*
 
+    ride x : Liste<booking> books;
+                      |
+                RequestBooking
+                  -rideId
+                  -passengerName
+                  -passengerId
+                  -passengerRate
+                  -stopoverName
+
+*/
 class Booked {
   int? passengerId;
   int? rideId;
@@ -56,3 +67,5 @@ class Booked {
     };
   }
 }
+
+

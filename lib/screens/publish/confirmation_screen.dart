@@ -8,9 +8,9 @@ import '../home_screen.dart';
 import 'package:http/http.dart' as http;
 
 class ConfirmationScreen extends StatefulWidget {
-  final RideData rideData;
+  RideData rideData;
 
-  const ConfirmationScreen({Key? key, required this.rideData}) : super(key: key);
+  ConfirmationScreen({Key? key, required this.rideData}) : super(key: key);
 
   @override
   State<ConfirmationScreen> createState() => _ConfirmationScreenState();
@@ -35,9 +35,10 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
 
     // Prepare JSON data for the request
     final rideJson = widget.rideData.toJson();
-
+    print(userModel.user?['userId']);
     // Use JsonEncoder to pretty-print the JSON string
     final jsonString = JsonEncoder.withIndent('  ').convert(rideJson);
+
 
     // Print the updated state (pretty-printed JSON)
     print(jsonString);

@@ -1,7 +1,8 @@
+import '../models/request_booking_data.dart';
 import 'StopoverDTO.dart';
 
 class RideDTO {
-  final String rideId;
+  final int rideId;
   final String rideDate;
   final String rideTime;
   final int numberOfSeat;
@@ -10,6 +11,7 @@ class RideDTO {
   final String carId;
   final List<String> preferences;
   final List<StopoverDTO> stopovers;
+  final List<RequestBooking> booking;
 
   RideDTO({
     required this.rideId,
@@ -21,11 +23,12 @@ class RideDTO {
     required this.carId,
     required this.preferences,
     required this.stopovers,
+    required this.booking
   });
 
   factory RideDTO.fromJson(Map<String, dynamic> json) {
     return RideDTO(
-      rideId: json['rideId'].toString(),
+      rideId: json['rideId'],
       rideDate: json['rideDate'],
       rideTime: json['rideTime'],
       numberOfSeat: json['numberOfSeat'],
@@ -34,6 +37,8 @@ class RideDTO {
       carId: json['carId'].toString(),
       preferences: List<String>.from(json['preferences']),
       stopovers: (json['stopovers'] as List).map((e) => StopoverDTO.fromJson(e)).toList(),
+      booking: (json['booking'] as List?)?.map((e) => RequestBooking.fromJson(e)).toList() ?? [],
+
     );
   }
 
@@ -48,6 +53,7 @@ class RideDTO {
       'carId': carId,
       'preferences': preferences,
       'stopovers': stopovers.map((e) => e.toJson()).toList(),
+      'RequestBooking':booking.map((e) => e.toJson()).toList
     };
   }
 }

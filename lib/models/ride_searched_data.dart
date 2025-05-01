@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'location_data.dart';
-
+import 'package:intl/intl.dart';
 class Car {
   String model;
   int age;
@@ -59,6 +59,8 @@ class RideSearchedData {
         alternativeType = null,
         car = null;
 
+// In your ride_searched_data.dart file, modify the toJson method:
+
   Map<String, dynamic> toJson() {
     return {
       'fromLocation': {
@@ -66,9 +68,9 @@ class RideSearchedData {
         'latitude': fromLocation.latitude,
         'longitude': fromLocation.longitude,
       },
-      'date': date.toIso8601String(),
-      'time': '${time.hour}:${time.minute}',
-      'rayonPossible': rayonPossible*1000,
+      'date': DateFormat('yyyy-MM-dd').format(date),  // Format for LocalDate
+      'time': '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',  // Format for LocalTime
+      'rayonPossible': rayonPossible,  // Convert to integer meters
       'alternativeType': alternativeType?.toString().split('.').last.toUpperCase(),
       'car': car?.toJson(),
     };
@@ -87,7 +89,7 @@ class RideSearchedData {
         hour: int.parse(timeParts[0]),
         minute: int.parse(timeParts[1]),
       ),
-      rayonPossible: (json['rayonPossible'] as num).toDouble(),
+      rayonPossible: json['rayonPossible'],
       alternativeType: json['alternativeType'] != null
           ? AlternativeType.values.firstWhere(
             (e) => e.toString().split('.').last == json['alternativeType'],

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../dto/RideDTO.dart';
 import 'stopover_data.dart';
 
+
 class RideData {
+  int? rideId;
   int? driverId;
   int? carId;
   DateTime? rideDate;
@@ -13,6 +15,7 @@ class RideData {
   List<String> preferences;
 
   RideData({
+    this.rideId,
     this.driverId,
     this.carId,
     this.rideDate,
@@ -25,7 +28,9 @@ class RideData {
         preferences = preferences ?? [];
 
   RideData.empty()
-      : driverId = null,
+
+      : rideId=null,
+        driverId = null,
         carId = null,
         rideDate = null,
         rideTime = null,
@@ -35,6 +40,7 @@ class RideData {
         preferences = [];
 
   factory RideData.fromJson(Map<String, dynamic> json) => RideData(
+    rideId: json['rideId'],
     driverId: json['driverId'],
     carId: json['carId'],
     rideDate: json['rideDate'] != null
@@ -59,6 +65,7 @@ class RideData {
   );
 
   Map<String, dynamic> toJson() => {
+    'rideId': rideId,
     'driverId': driverId,
     'carId': carId,
     'rideDate': rideDate != null

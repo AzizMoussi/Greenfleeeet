@@ -524,17 +524,23 @@ class _ResultScreenState extends State<ResultScreen> {
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        // Booking successful
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Booking successful!')),
         );
 
-        // Navigate to BookedScreen
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => BookedScreen()),
+        // Show BookedScreen as a card-like dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              insetPadding: EdgeInsets.all(20), // Margin from all sides
+              child: BookedScreen(), // Make sure this is a widget that fits well in a dialog
+            );
+          },
         );
-      } else {
+      }
+      else {
         // Handle server error
         print('Server error: ${response.body}');
         ScaffoldMessenger.of(context).showSnackBar(

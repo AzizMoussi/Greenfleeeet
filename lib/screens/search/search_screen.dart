@@ -128,6 +128,9 @@ class _FindRidePageState extends State<FindRidePage> {
   // Import the dart:convert package for JSON formatting
 
   void _handleFindRide() async {
+    debugPrint("HANDLE FIND RIDE CALLED");
+    debugPrint("HANDLE FIND RIDE CALLED");
+
     final userModel = Provider.of<UserModel>(context, listen: false);
     final token = userModel.token;
 
@@ -139,7 +142,9 @@ class _FindRidePageState extends State<FindRidePage> {
       return;
     }
 
+
     try {
+
       // Create RideSearchedData
       final rideData = RideSearchedData(
         fromLocation: Location(
@@ -163,7 +168,7 @@ class _FindRidePageState extends State<FindRidePage> {
       final jsonData = jsonEncode(rideData.toJson());
 
       // Log JSON Data for Debugging
-      print("Sending JSON Data: $jsonData");
+      debugPrint("Sending JSON Data: $jsonData");
 
       // Send POST Request
       final response = await http.post(
@@ -177,7 +182,7 @@ class _FindRidePageState extends State<FindRidePage> {
 
       // Handle Response
       if (response.statusCode == 200) {
-        print("Response: ${response.body}");
+        debugPrint("Response: ${response.body}");
         final List<dynamic> responseData = jsonDecode(response.body);
         final List<RideResponse> rides = responseData
             .map((rideJson) => RideResponse.fromJson(rideJson))
@@ -191,13 +196,13 @@ class _FindRidePageState extends State<FindRidePage> {
           ),
         );
       } else {
-        print("Error Response: ${response.body}");
+        debugPrint("Error Response: ${response.body}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error: ${response.statusCode}")),
         );
       }
     } catch (e) {
-      print("Exception: $e");
+      debugPrint("Exception: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Failed to fetch rides: $e")),
       );

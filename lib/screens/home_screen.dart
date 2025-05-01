@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'Inboxxxxxxx_screen.dart';
 import 'inbox_screen.dart';
 import 'my_rides_screen.dart';
 import 'profile_screen.dart';
@@ -19,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
     HomePage(),
     MyRidesScreen(),
     MyBookingScreen(), // Add the MyBookingScreen here
-    InboxScreen(),
+    InboxPage(),
     Profile(),
   ];
 

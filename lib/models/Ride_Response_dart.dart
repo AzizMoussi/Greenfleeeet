@@ -1,3 +1,5 @@
+
+
 class RideResponse {
   int rideId;
   int driverId;
@@ -25,7 +27,7 @@ class RideResponse {
       driverId: json['driverId'], // correct key
       driverName: json['driverName'],
       carName: json['carName'],
-      rateDriver: (json['rateDriver'] as num).toDouble(),
+      rateDriver:  (json['rateDriver'] as num?)?.toDouble() ?? 0.0,
       stopoverName: json['stopoverName'],
       distanceBetween: json['distanceBetween'],
       prefrences: List<String>.from(json['prefrences']), // typo respected

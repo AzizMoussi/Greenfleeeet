@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_course/screens/ride_details_screen.dart';
 import 'package:provider/provider.dart';
 import '../models/location_data.dart';
 import '../models/ride_screen.dart';
@@ -16,8 +17,6 @@ class MyRidesScreen extends StatefulWidget {
 
 class _MyRidesScreenState extends State<MyRidesScreen> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-
-
 
   @override
   void initState() {
@@ -91,6 +90,7 @@ class _MyRidesScreenState extends State<MyRidesScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final userModel = Provider.of<UserModel>(context, listen: false);
+    final user = userModel.user;
     final List<RideData> rides = userModel.getRides.map((rideDTO) {
       // Parse the date string to DateTime
       final dateParts = rideDTO.rideDate.split('-');
@@ -99,6 +99,7 @@ class _MyRidesScreenState extends State<MyRidesScreen> with SingleTickerProvider
         int.parse(dateParts[1]),  // month
         int.parse(dateParts[2]),  // day
       );
+      final driverId= user?['userId'];
 
       // Parse the time string to TimeOfDay
       final timeParts = rideDTO.rideTime.split(':');
@@ -121,7 +122,8 @@ class _MyRidesScreenState extends State<MyRidesScreen> with SingleTickerProvider
 
       // Create and return the RideData object
       return RideData(
-        driverId: int.tryParse(rideDTO.rideId),
+        rideId: rideDTO.rideId,
+        driverId:user?['userId'],
         carId: int.tryParse(rideDTO.carId),
         rideDate: rideDate,
         rideTime: rideTime,
@@ -364,8 +366,16 @@ class _MyRidesScreenState extends State<MyRidesScreen> with SingleTickerProvider
                         "View Details",
                         Icons.visibility_outlined,
                         const Color(0xFF0A8270),
-                            () {
-                          // View ride details
+                         () {
+                           Navigator.push(
+                             context,
+                             MaterialPageRoute(
+                               builder: (context) => RideDetailsScreen(rideId: ride.rideId!),
+                             ),
+                           );
+
+
+
                         },
                       ),
                     ],
