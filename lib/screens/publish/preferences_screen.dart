@@ -49,15 +49,15 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Travel Preferences"),
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: widget.onBack,
-        ),
-      ),
+      // appBar: AppBar(
+      //   title: const Text("Travel Preferences"),
+      //   backgroundColor: primaryColor,
+      //   foregroundColor: Colors.white,
+      //   leading: IconButton(
+      //     icon: const Icon(Icons.arrow_back),
+      //     onPressed: widget.onBack,
+      //   ),
+      // ),
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../dto/RideDTO.dart';
 import '../models/user_model.dart';
 import 'chat_screen.dart'; // Import the chat screen
+import 'inbox_screen.dart';
 import 'my_rides_screen.dart'; // Import the my rides screen
 
 class RideDetailsScreen extends StatefulWidget {
@@ -683,10 +684,9 @@ class _RideDetailsScreenState extends State<RideDetailsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ChatScreen(
-          senderId: ride['driverId'],
-          receiverId: passengerId,
-          receiverName: passengerName,
+        builder: (context) => ChatPage(
+          recipientId: passengerId.toString(),
+          recipientName: passengerName,
         ),
       ),
     );

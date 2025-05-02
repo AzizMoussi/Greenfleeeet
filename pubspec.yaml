@@ -31,6 +31,7 @@ dependencies:
 
   stomp_dart_client: ^0.4.4
   web_socket_channel: ^2.4.0
+  overlay_support: ^2.0.1
 
 
 dev_dependencies:
@@ -56,5 +57,8 @@ flutter:
     - images/qrcode.png
     - images/review.png
     - images/thanks.jpg
+    - images/frame3.png
+    - images/frame4.png
+    - images/frame5.png
 
 

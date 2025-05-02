@@ -89,7 +89,7 @@ class _MyRidesScreenState extends State<MyRidesScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    final userModel = Provider.of<UserModel>(context, listen: false);
+    final userModel = Provider.of<UserModel>(context);
     final user = userModel.user;
     final List<RideData> rides = userModel.getRides.map((rideDTO) {
       // Parse the date string to DateTime

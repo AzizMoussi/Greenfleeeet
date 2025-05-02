@@ -23,15 +23,15 @@ class _PlacesScreenState extends State<PlacesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("How many passengers can you take?"),
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: widget.onBack,
-        ),
-      ),
+      // appBar: AppBar(
+      //   title: const Text("How many passengers can you take?"),
+      //   backgroundColor: primaryColor,
+      //   foregroundColor: Colors.white,
+      //   leading: IconButton(
+      //     icon: const Icon(Icons.arrow_back),
+      //     onPressed: widget.onBack,
+      //   ),
+      // ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(

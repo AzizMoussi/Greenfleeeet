@@ -3,19 +3,24 @@ import 'package:device_preview/device_preview.dart';
 import 'package:provider/provider.dart';
 import 'models/user_model.dart';
 import 'screens/opening_screen.dart';
+import 'package:overlay_support/overlay_support.dart';
+
 
 
 void main() {
   runApp(
     ChangeNotifierProvider(
       create: (_) => UserModel(),
-      child: DevicePreview(
-        enabled: true,
-        builder: (context) => const MyApp(),
+      child: OverlaySupport.global(
+        child: DevicePreview(
+          enabled: true,
+          builder: (context) => const MyApp(),
+        ),
       ),
     ),
   );
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
