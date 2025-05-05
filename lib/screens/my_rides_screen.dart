@@ -89,6 +89,11 @@ class _MyRidesScreenState extends State<MyRidesScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    print("MyRides screen rebuilt");
+    print("MyRides screen rebuilt");
+
+
+
     final userModel = Provider.of<UserModel>(context);
     final user = userModel.user;
     final List<RideData> rides = userModel.getRides.map((rideDTO) {

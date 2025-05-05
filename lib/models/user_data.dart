@@ -9,9 +9,23 @@ class UserData {
   // We'll store it as "Male" or "Female"
   String? gender;
 
-  // You can also add a helper if needed:
+
   void setGenderFromTitle(String title) {
     gender = (title == "Mr.") ? "Male" : "Female";
+  }
+  String? formatDateOfBirth(String? dateOfBirth) {
+
+    if (dateOfBirth != null && dateOfBirth.isNotEmpty) {
+
+      try {
+        final parsedDate = DateTime.parse(dateOfBirth);
+        return parsedDate.toIso8601String().split('T')[0]; // Format "yyyy-MM-dd"
+      } catch (e) {
+
+        return null;
+      }
+    }
+    return null;
   }
 
   Map<String, dynamic> toJson() {
@@ -21,8 +35,9 @@ class UserData {
       'firstname': firstname,
       'lastname': lastname,
       'phoneNumber': phoneNumber,
-      'dateOfBirth': dateOfBirth,
+      'dateOfBirth':  formatDateOfBirth(dateOfBirth), // yyyy-MM-dd
       'gender': gender,
     };
   }
+
 }

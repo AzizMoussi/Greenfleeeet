@@ -59,8 +59,19 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
 
       // Check if the request was successful
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("7chinehhhhhhhhhhhhhhh");
+        final userModel = Provider.of<UserModel>(context,listen: false);
+        await userModel.fetchRides();
 
+
+        print("OKKKKKKKKKKKKKKKKKKKKKK");
+        print("OKKKKKKKKKKKKKKKKKKKKKK");
+        print("OKKKKKKKKKKKKKKKKKKKKKK");
+        print("OKKKKKKKKKKKKKKKKKKKKKK");
+        print("OKKKKKKKKKKKKKKKKKKKKKK");
+        print("OKKKKKKKKKKKKKKKKKKKKKK");
+
+
+        print(response.body);
         // Show a success Snackbar message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

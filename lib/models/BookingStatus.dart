@@ -1,6 +1,6 @@
 
 
-enum BookingStatus { PENDING, ONGOING, REJECTED, REACHED }
+enum BookingStatus { PENDING, ONGOING, REJECTED, REACHED,REACHEDSTOP }
 
 class Booked {
   int? passengerId;

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_course/screens/seeting_page.dart';
+import 'package:provider/provider.dart';
 
 
+import '../models/user_model.dart';
 import 'badges_page.dart';
 import 'edit_profile_screen.dart';
 import 'my_vehicles.dart';
@@ -11,6 +13,9 @@ class Profile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+
+
     return MaterialApp(
       title: 'Rider Profile',
       debugShowCheckedModeBanner: false,
@@ -62,15 +67,17 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStateMixin {
-  final String name = "Aziz Moussi";
+  late String name;
   final String location = "Tunis, Tunisia";
-  final double rating = 4.8;
-  final int rides = 52;
-  final int points = 3200;
+  final double rating = 4;
+  final int rides = 1;
+  final int points = 30;
 
   late AnimationController _controller;
   late Animation<double> _fadeInAnimation;
   bool _imageLoaded = false;
+
+
 
   @override
   void initState() {
@@ -79,6 +86,12 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = Provider.of<UserModel>(context, listen: false).user;
+      setState(() {
+        name = user?['firstname']+" "+user?['lastname'];
+      });
+    });
 
     _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
@@ -100,6 +113,9 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final user = Provider.of<UserModel>(context).user;
+
+
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -267,14 +283,6 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                           MaterialPageRoute(builder: (context) => const MyVehiclesPage()),
                         );
                       },
-                    ),
-                    _buildAction(
-                      context,
-                      Icons.history,
-                      "Ride History",
-                      "View your past rides",
-                      const Color(0xFF7E57C2),
-                      onTap: () {},
                     ),
                     _buildAction(
                       context,

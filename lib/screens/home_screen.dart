@@ -349,34 +349,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      //appBar: AppBar(
-        // title: Text(
-        //   _titles[_currentIndex], // Dynamically update AppBar title
-        //   style: TextStyle(
-        //     fontWeight: FontWeight.bold,
-        //     color: Colors.white,
-        //     fontSize: 22,
-        //     letterSpacing: 0.5,
-        //   ),
-        // ),
-        // centerTitle: true,
-        // backgroundColor: Color(0xffa0e1e1),
-        // elevation: 0,
-        // shape: RoundedRectangleBorder(
-        //   borderRadius: BorderRadius.vertical(
-        //     bottom: Radius.circular(16),
-        //   ),
-        // ),
-        // actions: [
-        //   if (_currentIndex == 3) // Show notifications icon only in InboxPage
-        //     IconButton(
-        //       icon: Icon(Icons.notifications_outlined, color: Colors.white),
-        //       onPressed: () {
-        //         // Notification action
-        //       },
-        //     ),
-        // ],
-      //),
       body: FadeTransition(
         opacity: _animationController,
         child: _screens[_currentIndex],

@@ -26,11 +26,6 @@ class _RideDetailsScreenState extends State<RideDetailsScreen> {
   String? carName;
 
 
-
-  // API configuration
-
-  // global list<vehicle> vehicles
-
   @override
   void initState() {
     super.initState();
@@ -96,8 +91,41 @@ class _RideDetailsScreenState extends State<RideDetailsScreen> {
     print('Found ride: ${ridetmp!.rideId}');
   }
 
+  Future<void> _Finished() async{
+    final userModel = Provider.of<UserModel>(context, listen: false); // Accès au modèle
+    final user = userModel.user; // Accéder à l'utilisateur global
+    final token = userModel.token;
+    try{
+      final response = await http.put(
+        Uri.parse('http://localhost:8080/rides/update/${ride['rideId']}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({
+          'stopoverIndex': 2,
+        }),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Stopover status updated to Completed'),
+          backgroundColor: const Color(0xFF14B8A6),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      int pointsEarned = 20;
 
 
+      setState(() {
+        userPoints += pointsEarned;
+      });
+
+      _showCongratulationDialog(pointsEarned);
+
+    }catch(e){
+
+    }
+  }
 
   Future<void> _handleStopoverAction(int index) async {
     final userModel = Provider.of<UserModel>(context, listen: false); // Accès au modèle
@@ -105,6 +133,7 @@ class _RideDetailsScreenState extends State<RideDetailsScreen> {
     final token = userModel.token;
     print("Linneeeeeee L index  "+ index.toString());
     print("lTOKEN L FIL DEBUG "+token!);
+
 
 
 
@@ -155,20 +184,24 @@ class _RideDetailsScreenState extends State<RideDetailsScreen> {
     }
 
     setState(() {
-      final List<dynamic> stopovers = List.from(ride['stopovers']);
-      stopovers[index] = Map<String, dynamic>.from(stopovers[index]);
-      stopovers[index]['stopoverStatus'] = newStatus;
-      ride['stopovers'] = stopovers;
+
+        final List<dynamic> stopovers = List.from(ride['stopovers']);
+        stopovers[index] = Map<String, dynamic>.from(stopovers[index]);
+        stopovers[index]['stopoverStatus'] = newStatus;
+        ride['stopovers'] = stopovers;
+
     });
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Stopover status updated to ${newStatus.toLowerCase()}'),
+          backgroundColor: const Color(0xFF14B8A6),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
     // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Stopover status updated to ${newStatus.toLowerCase()}'),
-        backgroundColor: const Color(0xFF14B8A6),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+
   }
 
 // Update the _handleDestinationAction method to pass the points to the congratulation dialog
@@ -845,7 +878,6 @@ class _RideDetailsScreenState extends State<RideDetailsScreen> {
 
   Widget _buildPreferencesCard() {
     final List<dynamic> preferences = ride['preferences'];
-
     return Card(
       elevation: 4,
       shadowColor: Colors.black.withOpacity(0.1),
@@ -966,10 +998,9 @@ class _RideDetailsScreenState extends State<RideDetailsScreen> {
                     isFirst: false,
                     isLast: false,
                     status: stopovers[i]['stopoverStatus'],
-                    onPressed: () => _handleStopoverAction(1), // lezim ta3tini l id ride w l id passenger
+                    onPressed: () => _handleStopoverAction(1),
                     buttonText: 'Arrived',
                   ),
-
                 // Destination
                 _buildFixedTimelineItem(
                   title: ride['destination']['name'],
@@ -977,7 +1008,7 @@ class _RideDetailsScreenState extends State<RideDetailsScreen> {
                   isFirst: false,
                   isLast: true,
                   status: ride['destination']['status'],
-                  onPressed: _handleDestinationAction,
+                  onPressed: () => _Finished(),
                   buttonText: 'Reached',
                 ),
               ],

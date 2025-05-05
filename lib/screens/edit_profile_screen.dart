@@ -63,7 +63,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Fetch user data from provider
-    _userModel = Provider.of<UserModel>(context);
+    _userModel = Provider.of<UserModel>(context,listen: false);
     _user = _userModel.user;
 
     if (_user != null) {

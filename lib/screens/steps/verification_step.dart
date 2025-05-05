@@ -25,7 +25,7 @@ class _VerificationStepState extends State<VerificationStep> {
   }
 
   void _startCountdown() {
-    _secondsRemaining = 30;
+    _secondsRemaining = 60;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining == 0) {
         _timer.cancel();

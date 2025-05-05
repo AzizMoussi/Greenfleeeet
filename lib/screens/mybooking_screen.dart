@@ -1,14 +1,21 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/user_model.dart';
 import '/models/booking_response_data.dart';
 
-class MyBookingScreen extends StatelessWidget {
+class MyBookingScreen extends StatefulWidget {
   MyBookingScreen({Key? key}) : super(key: key);
 
+  @override
+  State<MyBookingScreen> createState() => _MyBookingScreenState();
+}
+
+class _MyBookingScreenState extends State<MyBookingScreen> {
+  int _selectedRating = 5;
   Color getStatusColor(BookingStatus status) {
     switch (status) {
+      case BookingStatus.REACHEDSTOP:
+        return Colors.lightGreenAccent;
       case BookingStatus.PENDING:
         return Colors.orange;
       case BookingStatus.ONGOING:
@@ -18,12 +25,15 @@ class MyBookingScreen extends StatelessWidget {
       case BookingStatus.REACHED:
         return Colors.green;
       case BookingStatus.ACCEPTED:
-        return Colors.blue; // Blue color for accepted status
+        return Colors.blue;
+
     }
   }
 
   String getStatusText(BookingStatus status) {
     switch (status) {
+      case BookingStatus.REACHEDSTOP:
+        return 'On your Stop';
       case BookingStatus.PENDING:
         return 'Pending';
       case BookingStatus.ONGOING:
@@ -41,6 +51,7 @@ class MyBookingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final userModel = Provider.of<UserModel>(context);
     final List<BookingResponseDto> bookings = userModel.bookings;
+
 
 
     return Scaffold(
@@ -236,6 +247,72 @@ class MyBookingScreen extends StatelessWidget {
                               ],
                             ),
                           ),
+                          if (booking.bookingStatus == BookingStatus.REACHED)
+                            IconButton(
+                              icon: const Icon(Icons.rate_review, color: Colors.teal),
+                              tooltip: 'Rate this ride',
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    int localRating = _selectedRating; // Use a local rating for the dialog
+                                    return AlertDialog(
+                                      title: const Text('Rate Your Ride'),
+                                      content: StatefulBuilder(
+                                        builder: (context, setDialogState) => Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Text('Please provide your feedback and rating.'),
+                                            const SizedBox(height: 16),
+                                            TextField(
+                                              decoration: const InputDecoration(
+                                                labelText: 'Feedback',
+                                                border: OutlineInputBorder(),
+                                              ),
+                                              maxLines: 3,
+                                            ),
+                                            const SizedBox(height: 16),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: List.generate(5, (index) {
+                                                return IconButton(
+                                                  icon: Icon(
+                                                    index < localRating ? Icons.star : Icons.star_border,
+                                                    color: Colors.green,
+                                                    size: 32,
+                                                  ),
+                                                  onPressed: () {
+                                                    setDialogState(() {
+                                                      localRating = index + 1; // Update local state
+                                                    });
+                                                  },
+                                                );
+                                              }),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: const Text('Cancel'),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _selectedRating = localRating; // Update parent state
+                                            });
+                                            // TODO: Submit rating logic
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('Submit'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
                         ],
                       ),
                     ],

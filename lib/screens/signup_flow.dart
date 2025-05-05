@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'dart:convert';
 
+import '../dto/RideDTO.dart';
+import '../dto/VehicleDTO.dart';
+import '../models/user_model.dart';
 import '../widgets/progress_indicator.dart';
 
+import 'first_screen.dart';
 import 'steps/password_step.dart';
 import 'steps/name_step.dart';
 import 'steps/phone_step.dart' as phone;
@@ -62,8 +67,10 @@ class _SignUpFlowState extends State<SignUpFlow> {
       );
 
       if (response.statusCode == 200) {
+        // Show success dialog
         nextPage();
-      } else {
+
+      }else {
         print('Server responded: ${response.body}');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Signup failed. Please try again.')),
@@ -142,7 +149,7 @@ class _SignUpFlowState extends State<SignUpFlow> {
                 ),
                 DobStep(
                   onNext: (dob) {
-                    userData.dateOfBirth = dob;
+                    userData.dateOfBirth = dob ;
                     nextPage();
                   },
                   onBack: previousPage,
@@ -156,11 +163,13 @@ class _SignUpFlowState extends State<SignUpFlow> {
                 ),
                 VerificationStep(
                   onSubmit: (code) async {
-                    /*final url = Uri.parse('http://localhost:8080/auth/verify');
+                    final url = Uri.parse('http://localhost:8080/auth/verify');
                      final body = {
                        'email': userData.email,
                        'verificationCode': code,
                      };
+                     print(userData.email);
+                     print(code);
 
                      try {
                        final response = await http.post(
@@ -169,12 +178,29 @@ class _SignUpFlowState extends State<SignUpFlow> {
                          body: jsonEncode(body),
                        );
 
-                      if (response.statusCode == 200) {*/
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-                    /*   } else {
+                      if (response.statusCode == 200) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Signup Successful"),
+                              content: Text("Your account has been created. Please log in."),
+                              actions: [
+                                TextButton(
+                                  child: Text("OK"),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Close the dialog
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                                    );
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                    } else {
                          print('Verification failed: ${response.body}');
                          ScaffoldMessenger.of(context).showSnackBar(
                            SnackBar(content: Text('Verification failed. Please check the code.')),
@@ -184,7 +210,7 @@ class _SignUpFlowState extends State<SignUpFlow> {
                        ScaffoldMessenger.of(context).showSnackBar(
                          SnackBar(content: Text('An error occurred during verification.')),
                        );
-                     } */
+                     }
                   },
                   onBack: previousPage,
                 ),

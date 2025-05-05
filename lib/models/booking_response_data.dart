@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-enum BookingStatus { PENDING, ONGOING, REJECTED, REACHED , ACCEPTED }
+enum BookingStatus { PENDING, ONGOING, REJECTED, REACHED , ACCEPTED, REACHEDSTOP }
 
 class BookingResponseDto {
   String pickupLocation;
