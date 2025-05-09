@@ -68,12 +68,6 @@ class _PlacesScreenState extends State<PlacesScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            _buildCheckboxTile(
-              icon: Icons.female,
-              label: "Women Only",
-              value: womenOnly,
-              onChanged: (val) => setState(() => womenOnly = val!),
-            ),
             const Spacer(),
             SizedBox(
               width: double.infinity,

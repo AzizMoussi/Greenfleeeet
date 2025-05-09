@@ -125,8 +125,6 @@ class _FindRidePageState extends State<FindRidePage> {
     }
   }
 
-  // Import the dart:convert package for JSON formatting
-
   void _handleFindRide() async {
     debugPrint("HANDLE FIND RIDE CALLED");
     debugPrint("HANDLE FIND RIDE CALLED");
@@ -237,6 +235,7 @@ class _FindRidePageState extends State<FindRidePage> {
           },
         ),
       ),
+
       body: SafeArea(
         child: Container(
           /*decoration: BoxDecoration(
@@ -427,7 +426,7 @@ class _FindRidePageState extends State<FindRidePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "TRANSPORTATION",
+                        "What’s your alternative if you don’t take carpool?",
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -683,4 +682,3 @@ class _FindRidePageState extends State<FindRidePage> {
   }
 }
 
-/* lclass mta3 e données eli bech yousseli esmou ride_searched_data */
